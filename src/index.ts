@@ -1,5 +1,13 @@
 import express from "express";
+import { handlerReadiness } from "./handlers/readiness.js";
 
 const app = express();
+const PORT = 8080;
 
-app.listen("8080");
+app.use("/app", express.static("./src/app"));
+
+app.get("/healthz", handlerReadiness);
+
+app.listen(PORT, () => {
+  console.log(`Server listening on port: ${PORT}...`);
+});
