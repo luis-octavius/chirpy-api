@@ -13,8 +13,8 @@ app.use("/app", express.static("./src/app"));
 app.use(middlewareLogResponses);
 
 app.get("/api/healthz", handlerReadiness);
-app.get("/api/metrics", handlerMetrics);
-app.get("/api/reset", handlerResetMetrics);
+app.get("/admin/metrics", handlerMetrics);
+app.post("/admin/reset", handlerResetMetrics);
 
 app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}...`);

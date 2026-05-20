@@ -3,10 +3,19 @@ import { Request, Response } from "express";
 
 export async function handlerMetrics(_: Request, res: Response) {
   res.set({
-    "Content-Type": "text/plain; charset=utf-8",
+    "Content-Type": "text/html; charset=utf-8",
   });
 
-  res.send(`Hits: ${config.fileServerHits}`);
+  const template = `
+    <html>
+      <body>
+        <h1>Welcome, Chirpy Admin</h1>
+        <p>Chirpy has been visited ${config.fileServerHits} times!</p>
+      </body>
+    </html>
+  `;
+
+  res.send(template);
 }
 
 export async function handlerResetMetrics(_: Request, res: Response) {
