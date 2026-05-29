@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { respondWithError, respondWithJSON } from "./json.js";
+import { respondWithJSON } from "./json.js";
+import { BadRequestError } from "./errors.js";
 
 export async function handlerValidateChirp(req: Request, res: Response) {
   type parameters = {
@@ -8,21 +9,17 @@ export async function handlerValidateChirp(req: Request, res: Response) {
 
   const MAX_CHIRP_LENGTH = 140;
 
-  try {
-    const { body } = req.body as parameters;
+  const { body } = req.body as parameters;
 
-    if (body.length >= MAX_CHIRP_LENGTH) {
-      return respondWithError(res, 400, "Chirp is too long");
-    }
-
-    const filteredBody = filterWords(body);
-
-    respondWithJSON(res, 200, {
-      cleanedBody: filteredBody,
-    });
-  } catch (error) {
-    return respondWithError(res, 500, "Internal server error");
+  if (body.length >= MAX_CHIRP_LENGTH) {
+    throw new BadRequestError("Chirp is too long. Max length is 140");
   }
+
+  const filteredBody = filterWords(body);
+
+  respondWithJSON(res, 200, {
+    cleanedBody: filteredBody,
+  });
 }
 
 function filterWords(body: string) {

@@ -1,7 +1,10 @@
 import express from "express";
 import { handlerReadiness } from "./api/readiness.js";
-import { middlewareLogResponses } from "./api/middleware.js";
-import { middlewareMetricsInc } from "./api/middleware.js";
+import {
+  middlewareLogResponses,
+  middlewareMetricsInc,
+} from "./api/middleware.js";
+import { errorHandler } from "./api/errors.js";
 import { handlerMetrics, handlerResetMetrics } from "./api/metrics.js";
 import { handlerValidateChirp } from "./api/validateChirp.js";
 
@@ -15,12 +18,23 @@ app.use(middlewareLogResponses);
 app.use(express.json());
 
 // api endpoints
-app.get("/api/healthz", handlerReadiness);
-app.post("/api/validate_chirp", handlerValidateChirp);
+app.get("/api/healthz", (req, res, next) => {
+  Promise.resolve(handlerReadiness(req, res).catch(next));
+});
+
+app.post("/api/validate_chirp", (req, res, next) => {
+  Promise.resolve(handlerValidateChirp(req, res)).catch(next);
+});
 
 // admin endpoints
-app.get("/admin/metrics", handlerMetrics);
-app.post("/admin/reset", handlerResetMetrics);
+app.get("/admin/metrics", (req, res, next) => {
+  Promise.resolve(handlerMetrics(req, res).catch(next));
+});
+app.post("/admin/reset", (req, res, next) => {
+  Promise.resolve(handlerResetMetrics(req, res).catch(next));
+});
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}...`);
