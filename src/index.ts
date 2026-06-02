@@ -6,7 +6,7 @@ import {
 } from "./api/middleware.js";
 import { errorHandler } from "./api/errors.js";
 import { handlerMetrics } from "./api/metrics.js";
-import { handlerValidateChirp } from "./api/validateChirp.js";
+import { handlerAddChirp, handlerAllChirps } from "./api/chirps.js";
 import { handlerCreateUser, handlerReset } from "./api/users.js";
 
 import { config } from "./config.js";
@@ -31,10 +31,16 @@ app.get("/api/healthz", (req, res, next) => {
   Promise.resolve(handlerReadiness(req, res).catch(next));
 });
 
-app.post("/api/validate_chirp", (req, res, next) => {
-  Promise.resolve(handlerValidateChirp(req, res)).catch(next);
+// chirp endpoints
+app.post("/api/chirps", (req, res, next) => {
+  Promise.resolve(handlerAddChirp(req, res)).catch(next);
 });
 
+app.get("/api/chirps", (req, res, next) => {
+  Promise.resolve(handlerAllChirps(req, res)).catch(next);
+});
+
+// user endpoints
 app.post("/api/users", (req, res, next) => {
   Promise.resolve(handlerCreateUser(req, res)).catch(next);
 });
