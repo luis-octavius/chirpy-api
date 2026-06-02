@@ -5,8 +5,17 @@ import {
   middlewareMetricsInc,
 } from "./api/middleware.js";
 import { errorHandler } from "./api/errors.js";
-import { handlerMetrics, handlerResetMetrics } from "./api/metrics.js";
+import { handlerMetrics } from "./api/metrics.js";
 import { handlerValidateChirp } from "./api/validateChirp.js";
+import { handlerCreateUser, handlerReset } from "./api/users.js";
+
+import { config } from "./config.js";
+import postgres from "postgres";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { drizzle } from "drizzle-orm/postgres-js";
+
+const migrationClient = postgres(config.db.url, { max: 1 });
+await migrate(drizzle(migrationClient), config.db.migrationConfig);
 
 const app = express();
 const PORT = 8080;
@@ -26,12 +35,16 @@ app.post("/api/validate_chirp", (req, res, next) => {
   Promise.resolve(handlerValidateChirp(req, res)).catch(next);
 });
 
+app.post("/api/users", (req, res, next) => {
+  Promise.resolve(handlerCreateUser(req, res)).catch(next);
+});
+
 // admin endpoints
 app.get("/admin/metrics", (req, res, next) => {
   Promise.resolve(handlerMetrics(req, res).catch(next));
 });
 app.post("/admin/reset", (req, res, next) => {
-  Promise.resolve(handlerResetMetrics(req, res).catch(next));
+  Promise.resolve(handlerReset(req, res).catch(next));
 });
 
 app.use(errorHandler);

@@ -17,12 +17,3 @@ export async function handlerMetrics(_: Request, res: Response) {
 
   res.send(template);
 }
-
-export async function handlerResetMetrics(_: Request, res: Response) {
-  config.fileServerHits = 0;
-
-  res.on("finish", () => {
-    console.log("Reset successful");
-  });
-  res.end();
-}
