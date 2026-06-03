@@ -6,7 +6,11 @@ import {
 } from "./api/middleware.js";
 import { errorHandler } from "./api/errors.js";
 import { handlerMetrics } from "./api/metrics.js";
-import { handlerAddChirp, handlerAllChirps } from "./api/chirps.js";
+import {
+  handlerAddChirp,
+  handlerAllChirps,
+  handlerGetChirpById,
+} from "./api/chirps.js";
 import { handlerCreateUser, handlerReset } from "./api/users.js";
 
 import { config } from "./config.js";
@@ -38,6 +42,10 @@ app.post("/api/chirps", (req, res, next) => {
 
 app.get("/api/chirps", (req, res, next) => {
   Promise.resolve(handlerAllChirps(req, res)).catch(next);
+});
+
+app.get("/api/chirps/:chirpId", (req, res, next) => {
+  Promise.resolve(handlerGetChirpById(req, res)).catch(next);
 });
 
 // user endpoints
