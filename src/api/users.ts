@@ -1,15 +1,24 @@
 import { Request, Response } from "express";
-import { createUser, deleteUsers } from "../db/queries/users.js";
-import { CreateUserRequest, CreateUserResponse } from "../types/users.js";
+import {
+  createUser,
+  deleteUsers,
+  getUserByEmail,
+} from "../db/queries/users.js";
+import { UserRequest, CreateUserResponse } from "../types/users.js";
 import { respondWithJSON } from "./json.js";
 import { config } from "../config.js";
 import { UnauthorizedError } from "./errors.js";
+import { checkPasswordHash, hashPassword } from "../auth/auth.js";
 
 export async function handlerCreateUser(req: Request, res: Response) {
-  const { email } = req.body as CreateUserRequest;
+  const { email, password } = req.body as UserRequest;
 
   try {
-    const user = await createUser({ email: email });
+    const hashedPassword = await hashPassword(password);
+    const user = await createUser({
+      email: email,
+      hashedPassword: hashedPassword,
+    });
 
     respondWithJSON(res, 201, {
       id: user.id,
@@ -40,5 +49,31 @@ export async function handlerReset(_: Request, res: Response) {
     return;
   } catch (err) {
     console.error(err);
+  }
+}
+
+export async function handlerLogin(req: Request, res: Response) {
+  const { email, password } = req.body as UserRequest;
+
+  try {
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+      throw new Error();
+    }
+    const isUserPassword = await checkPasswordHash(
+      password,
+      user.hashedPassword,
+    );
+
+    if (!isUserPassword) {
+      throw new Error();
+    }
+
+    const { hashedPassword, ...safeUser } = user;
+
+    respondWithJSON(res, 200, safeUser);
+  } catch (err) {
+    throw new UnauthorizedError("Incorrect email or password");
   }
 }

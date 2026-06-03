@@ -1,10 +1,8 @@
-export type CreateUserRequest = {
+import type { NewUser } from "../db/schema.js";
+
+export type UserRequest = {
   email: string;
+  password: string;
 };
 
-export type CreateUserResponse = {
-  id: string;
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+export type CreateUserResponse = Omit<NewUser, "hashedPassword">;

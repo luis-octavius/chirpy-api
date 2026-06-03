@@ -11,13 +11,14 @@ import {
   handlerAllChirps,
   handlerGetChirpById,
 } from "./api/chirps.js";
-import { handlerCreateUser, handlerReset } from "./api/users.js";
+import { handlerCreateUser, handlerLogin, handlerReset } from "./api/users.js";
 
 import { config } from "./config.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 
+// do the migration automatically at the app initialization
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
 
@@ -51,6 +52,10 @@ app.get("/api/chirps/:chirpId", (req, res, next) => {
 // user endpoints
 app.post("/api/users", (req, res, next) => {
   Promise.resolve(handlerCreateUser(req, res)).catch(next);
+});
+
+app.post("/api/login", (req, res, next) => {
+  Promise.resolve(handlerLogin(req, res)).catch(next);
 });
 
 // admin endpoints
