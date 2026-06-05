@@ -3,17 +3,23 @@ import {
   createUser,
   deleteUsers,
   getUserByEmail,
+  updateEmailAndPassword,
 } from "../db/queries/users.js";
 import { UserRequest, CreateUserResponse } from "../types/users.js";
 import { respondWithJSON } from "./json.js";
 import { config } from "../config.js";
-import { BadRequestError, UnauthorizedError } from "./errors.js";
+import {
+  BadRequestError,
+  ForbiddenError,
+  UnauthorizedError,
+} from "./errors.js";
 import {
   checkPasswordHash,
   getBearerToken,
   hashPassword,
   makeJWT,
   makeRefreshToken,
+  validateJWT,
 } from "../auth/auth.js";
 import {
   createRefreshToken,
@@ -141,4 +147,27 @@ export async function handlerRevokeRefreshToken(req: Request, res: Response) {
   } catch (err) {
     throw new Error("Error revoking refresh token");
   }
+}
+
+export async function handlerUpdateUser(req: Request, res: Response) {
+  const accessToken = getBearerToken(req);
+
+  if (!accessToken) {
+    throw new UnauthorizedError("Invalid access token");
+  }
+
+  const userId = validateJWT(accessToken, config.secret);
+  if (!userId) {
+    throw new UnauthorizedError("Token have expired or is not valid");
+  }
+
+  const { password, email } = req.body;
+
+  const hashedPassword = await hashPassword(password);
+  if (!hashedPassword || !password || !email) {
+    throw new BadRequestError("Invalid request");
+  }
+
+  const updatedUser = await updateEmailAndPassword(hashedPassword, email);
+  respondWithJSON(res, 200, updatedUser);
 }

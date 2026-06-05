@@ -17,6 +17,7 @@ import {
   handlerRefreshToken,
   handlerRevokeRefreshToken,
   handlerReset,
+  handlerUpdateUser,
 } from "./api/users.js";
 
 import { config } from "./config.js";
@@ -70,6 +71,10 @@ app.post("/api/refresh", (req, res, next) => {
 
 app.post("/api/revoke", (req, res, next) => {
   Promise.resolve(handlerRevokeRefreshToken(req, res)).catch(next);
+});
+
+app.put("/api/users", (req, res, next) => {
+  Promise.resolve(handlerUpdateUser(req, res)).catch(next);
 });
 
 // admin endpoints
