@@ -11,7 +11,13 @@ import {
   handlerAllChirps,
   handlerGetChirpById,
 } from "./api/chirps.js";
-import { handlerCreateUser, handlerLogin, handlerReset } from "./api/users.js";
+import {
+  handlerCreateUser,
+  handlerLogin,
+  handlerRefreshToken,
+  handlerRevokeRefreshToken,
+  handlerReset,
+} from "./api/users.js";
 
 import { config } from "./config.js";
 import postgres from "postgres";
@@ -56,6 +62,14 @@ app.post("/api/users", (req, res, next) => {
 
 app.post("/api/login", (req, res, next) => {
   Promise.resolve(handlerLogin(req, res)).catch(next);
+});
+
+app.post("/api/refresh", (req, res, next) => {
+  Promise.resolve(handlerRefreshToken(req, res)).catch(next);
+});
+
+app.post("/api/revoke", (req, res, next) => {
+  Promise.resolve(handlerRevokeRefreshToken(req, res)).catch(next);
 });
 
 // admin endpoints

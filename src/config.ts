@@ -9,6 +9,9 @@ type APIConfig = {
   fileServerHits: number;
   db: DBConfig;
   platform: string;
+  secret: string;
+  defaultJWTDuration: Date;
+  defaultRefreshDuration: Date;
 };
 
 type DBConfig = {
@@ -23,6 +26,9 @@ export const config = {
     migrationConfig: migrationConfig,
   },
   platform: envOrThrow("PLATFORM"),
+  secret: envOrThrow("SECRET"),
+  defaultJWTDuration: new Date(Date.now() + 60 * 60 * 1000),
+  defaultRefreshDuration: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
 } as APIConfig;
 
 function envOrThrow(key: string) {

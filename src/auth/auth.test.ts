@@ -4,8 +4,10 @@ import {
   validateJWT,
   hashPassword,
   checkPasswordHash,
+  extractBearerToken,
 } from "./auth.js";
-import { UnauthorizedError } from "../api/errors.js";
+import { BadRequestError, UnauthorizedError } from "../api/errors.js";
+import { Request } from "express";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -80,5 +82,17 @@ describe("JWT validation", () => {
     expect(() => validateJWT(tokenTwo, "wrong-secret")).toThrowError(
       UnauthorizedError,
     );
+  });
+});
+
+describe("Bearer Token validation", () => {
+  it("should extract the token from a valid header", () => {
+    const header = "Bearer myToken123";
+    expect(extractBearerToken(header)).toBe("myToken123");
+  });
+
+  it("should throw an error if the token is invalid", () => {
+    const header = "Bearer";
+    expect(() => extractBearerToken(header)).toThrowError(BadRequestError);
   });
 });

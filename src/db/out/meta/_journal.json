@@ -22,6 +22,13 @@
       "when": 1780447079899,
       "tag": "0002_lively_cerebro",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780684322427,
+      "tag": "0003_third_nightshade",
+      "breakpoints": true
     }
   ]
 }

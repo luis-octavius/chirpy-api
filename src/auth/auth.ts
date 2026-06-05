@@ -1,7 +1,10 @@
 import * as argon from "argon2";
+import { randomBytes } from "node:crypto";
 import jwt from "jsonwebtoken";
 import type { payload } from "../types/auth.js";
-import { UnauthorizedError } from "../api/errors.js";
+import { BadRequestError, UnauthorizedError } from "../api/errors.js";
+import { Request } from "express";
+import { config } from "../config.js";
 
 export async function hashPassword(password: string): Promise<string> {
   try {
@@ -37,7 +40,7 @@ export function makeJWT(
     iss: "chirpy",
     sub: userID,
     iat: iat,
-    exp: iat + expiresIn,
+    exp: config.defaultJWTDuration.getTime(),
   };
 
   const token = jwt.sign(payload, secret, { algorithm: "HS256" });
@@ -51,4 +54,22 @@ export function validateJWT(tokenString: string, secret: string): string {
   } catch (err) {
     throw new UnauthorizedError("Token is invalid");
   }
+}
+
+export function getBearerToken(req: Request): string {
+  const bearerToken = req.get("Authorization");
+  if (!bearerToken) throw new UnauthorizedError("Authorization not found");
+
+  return extractBearerToken(bearerToken);
+}
+
+export function extractBearerToken(header: string): string {
+  const token = header.replace("Bearer", "").trim();
+  if (!token) throw new BadRequestError("Invalid token");
+  return token;
+}
+
+export function makeRefreshToken(): string {
+  const hexStr = randomBytes(256);
+  return hexStr.toString("hex");
 }

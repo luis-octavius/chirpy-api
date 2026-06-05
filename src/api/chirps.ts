@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
 import { respondWithJSON } from "./json.js";
-import { BadRequestError, NotFoundError } from "./errors.js";
+import { config } from "../config.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
 import { CreateChirpRequest } from "../types/chirps.js";
 import { createChirp, getChirpById, getChirps } from "../db/queries/chirps.js";
+import { getBearerToken, validateJWT } from "../auth/auth.js";
 
 export async function handlerAddChirp(req: Request, res: Response) {
   const MAX_CHIRP_LENGTH = 140;
 
-  const { body, userId } = req.body as CreateChirpRequest;
+  const { body } = req.body as CreateChirpRequest;
 
   if (body.length >= MAX_CHIRP_LENGTH) {
     throw new BadRequestError("Chirp is too long. Max length is 140");
@@ -15,8 +17,14 @@ export async function handlerAddChirp(req: Request, res: Response) {
 
   const filteredBody = filterWords(body);
 
+  const bearer = getBearerToken(req);
+  const userId = validateJWT(bearer, config.secret);
+  if (!userId) {
+    throw new UnauthorizedError("You cannot post a chirp");
+  }
+
   try {
-    const chirp = await createChirp({ body, userId });
+    const chirp = await createChirp({ body: filteredBody, userId: userId });
     respondWithJSON(res, 201, chirp);
   } catch (err) {
     throw new BadRequestError(`Error adding chirp: ${(err as Error).message}`);
