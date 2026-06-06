@@ -98,5 +98,4 @@ app.post("/admin/reset", (req, res, next) => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server listening on port: ${PORT}...`);
 });

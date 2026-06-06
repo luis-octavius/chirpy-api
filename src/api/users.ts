@@ -111,7 +111,7 @@ export async function handlerRefreshToken(req: Request, res: Response) {
 
   const jwtToken = makeJWT(
     user.id,
-    config.defaultJWTDuration.getTime(),
+    config.jwt.jwtDuration.getTime(),
     config.secret,
   );
 

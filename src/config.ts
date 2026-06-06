@@ -10,8 +10,11 @@ type APIConfig = {
   db: DBConfig;
   platform: string;
   secret: string;
-  defaultJWTDuration: Date;
-  defaultRefreshDuration: Date;
+  jwt: {
+    refreshTokenDuration: Date;
+    jwtDuration: Date;
+  };
+  apiKey: string;
 };
 
 type DBConfig = {
@@ -27,8 +30,11 @@ export const config = {
   },
   platform: envOrThrow("PLATFORM"),
   secret: envOrThrow("SECRET"),
-  defaultJWTDuration: new Date(Date.now() + 60 * 60 * 1000),
-  defaultRefreshDuration: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+  jwt: {
+    jwtDuration: new Date(Date.now() + 60 * 60 * 1000),
+    refreshTokenDuration: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+  },
+  apiKey: envOrThrow("POLKA_KEY"),
 } as APIConfig;
 
 function envOrThrow(key: string) {

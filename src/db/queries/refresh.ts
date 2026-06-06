@@ -9,7 +9,7 @@ export async function createRefreshToken(userId: string, token: string) {
     .values({
       userId: userId,
       token: token,
-      expiresAt: config.defaultRefreshDuration,
+      expiresAt: config.jwt.refreshTokenDuration,
       revokedAt: null,
     })
     .returning();

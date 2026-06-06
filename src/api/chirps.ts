@@ -44,8 +44,6 @@ export async function handlerAddChirp(req: Request, res: Response) {
 export async function handlerAllChirps(req: Request, res: Response) {
   try {
     let allChirps = await getChirps();
-    console.log("allChirps: ", allChirps);
-    respondWithJSON(res, 200, allChirps);
   } catch (err) {
     throw new Error("Error getting all the chirps");
   }

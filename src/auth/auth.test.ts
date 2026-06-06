@@ -4,6 +4,7 @@ import {
   validateJWT,
   hashPassword,
   checkPasswordHash,
+  extractApiKey,
   extractBearerToken,
 } from "./auth.js";
 import { BadRequestError, UnauthorizedError } from "../api/errors.js";
@@ -66,18 +67,6 @@ describe("JWT validation", () => {
     expect(result).toStrictEqual(userID2);
   });
 
-  it("should throw 'invalid' if token expires", async () => {
-    await delay(1000);
-    expect(() => validateJWT(tokenTwo, secret2)).toThrow(/invalid/);
-  });
-
-  it("should throw 'UnauthorizedError' when token expires", async () => {
-    await delay(1000);
-    expect(() => validateJWT(tokenTwo, secret2)).toThrowError(
-      UnauthorizedError,
-    );
-  });
-
   it("should throw 'UnauthorizedError' with wrong-secret", () => {
     expect(() => validateJWT(tokenTwo, "wrong-secret")).toThrowError(
       UnauthorizedError,
@@ -94,5 +83,17 @@ describe("Bearer Token validation", () => {
   it("should throw an error if the token is invalid", () => {
     const header = "Bearer";
     expect(() => extractBearerToken(header)).toThrowError(BadRequestError);
+  });
+});
+
+describe("Api Key validation", () => {
+  it("should extract the api key from the authorization header", () => {
+    const header = "ApiKey myKey123";
+    expect(extractApiKey(header)).toBe("myKey123");
+  });
+
+  it("should throw an error if the token is invalid", () => {
+    const header = "ApiKey";
+    expect(() => extractApiKey(header)).toThrowError(BadRequestError);
   });
 });

@@ -40,7 +40,7 @@ export function makeJWT(
     iss: "chirpy",
     sub: userID,
     iat: iat,
-    exp: config.defaultJWTDuration.getTime(),
+    exp: config.jwt.jwtDuration.getTime(),
   };
 
   const token = jwt.sign(payload, secret, { algorithm: "HS256" });
@@ -72,4 +72,16 @@ export function extractBearerToken(header: string): string {
 export function makeRefreshToken(): string {
   const hexStr = randomBytes(256);
   return hexStr.toString("hex");
+}
+
+export function getApiKey(req: Request) {
+  const apiKey = req.get("Authorization");
+  if (!apiKey) throw new UnauthorizedError("Api Key not found");
+  return extractApiKey(apiKey);
+}
+
+export function extractApiKey(header: string): string {
+  const key = header.replace("ApiKey", "").trim();
+  if (!key) throw new BadRequestError("Invalid api key");
+  return key;
 }
