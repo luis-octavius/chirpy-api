@@ -1,7 +1,8 @@
+import { NotFoundError } from "../../api/errors.js";
 import { CreateUserResponse } from "../../types/users.js";
 import { db } from "../index.js";
 import { NewUser, users } from "../schema.js";
-import { eq } from "drizzle-orm";
+import { eq, getTableColumns } from "drizzle-orm";
 
 export async function createUser(user: NewUser) {
   const [newUser] = await db
@@ -31,4 +32,20 @@ export async function updateEmailAndPassword(password: string, email: string) {
     .returning();
   const omitPassword = updatedUser as CreateUserResponse;
   return omitPassword;
+}
+
+export async function updateChirpyRedStatusById(userId: string) {
+  const [updatedUser] = await db
+    .update(users)
+    .set({
+      isChirpyRed: true,
+    })
+    .where(eq(users.id, userId))
+    .returning();
+  if (!updatedUser) {
+    throw new NotFoundError("User not found");
+  }
+
+  const { hashedPassword, ...otherColumns } = updatedUser;
+  return otherColumns;
 }

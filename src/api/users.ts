@@ -27,22 +27,19 @@ import {
 export async function handlerCreateUser(req: Request, res: Response) {
   const { email, password } = req.body as UserRequest;
 
-  try {
-    const hashedPassword = await hashPassword(password);
-    const user = await createUser({
-      email: email,
-      hashedPassword: hashedPassword,
-    });
+  const hashedPassword = await hashPassword(password);
+  const user = await createUser({
+    email: email,
+    hashedPassword: hashedPassword,
+  });
 
-    respondWithJSON(res, 201, {
-      id: user.id,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    } as CreateUserResponse);
-  } catch (err) {
-    console.error("Error: ", err);
-  }
+  respondWithJSON(res, 201, {
+    id: user.id,
+    email: user.email,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    isChirpyRed: user.isChirpyRed,
+  } as CreateUserResponse);
 }
 
 export async function handlerReset(_: Request, res: Response) {
@@ -54,15 +51,10 @@ export async function handlerReset(_: Request, res: Response) {
 
   config.fileServerHits = 0;
 
-  try {
-    await deleteUsers();
+  await deleteUsers();
 
-    const msg = "Users deleted successfully";
-    respondWithJSON(res, 200, msg);
-    return;
-  } catch (err) {
-    console.error(err);
-  }
+  const msg = "Users deleted successfully";
+  respondWithJSON(res, 200, msg);
 }
 
 export async function handlerLogin(req: Request, res: Response) {
@@ -86,8 +78,7 @@ export async function handlerLogin(req: Request, res: Response) {
     const token = makeJWT(user.id, 3600, config.secret);
     const refreshToken = makeRefreshToken();
 
-    const createdRefreshToken = await createRefreshToken(user.id, refreshToken);
-    console.log(createdRefreshToken);
+    const _ = await createRefreshToken(user.id, refreshToken);
 
     const { hashedPassword, ...safeUser } = user;
 

@@ -6,3 +6,10 @@ export type UserRequest = {
 };
 
 export type CreateUserResponse = Omit<NewUser, "hashedPassword">;
+
+export type Webhook = {
+  event: string;
+  data: {
+    userId: string;
+  };
+};

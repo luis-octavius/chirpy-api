@@ -20,6 +20,7 @@ import {
   handlerReset,
   handlerUpdateUser,
 } from "./api/users.js";
+import { handlerUpdateMembership } from "./api/polka.js";
 
 import { config } from "./config.js";
 import postgres from "postgres";
@@ -41,7 +42,11 @@ app.use(express.json());
 
 // api endpoints
 app.get("/api/healthz", (req, res, next) => {
-  Promise.resolve(handlerReadiness(req, res).catch(next));
+  Promise.resolve(handlerReadiness(req, res)).catch(next);
+});
+
+app.post("/api/polka/webhooks", (req, res, next) => {
+  Promise.resolve(handlerUpdateMembership(req, res)).catch(next);
 });
 
 // chirp endpoints
@@ -84,10 +89,10 @@ app.put("/api/users", (req, res, next) => {
 
 // admin endpoints
 app.get("/admin/metrics", (req, res, next) => {
-  Promise.resolve(handlerMetrics(req, res).catch(next));
+  Promise.resolve(handlerMetrics(req, res)).catch(next);
 });
 app.post("/admin/reset", (req, res, next) => {
-  Promise.resolve(handlerReset(req, res).catch(next));
+  Promise.resolve(handlerReset(req, res)).catch(next);
 });
 
 app.use(errorHandler);

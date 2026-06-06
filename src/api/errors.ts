@@ -27,21 +27,19 @@ export class NotFoundError extends Error {
 
 export async function errorHandler(
   err: Error,
-  req: Request,
+  _: Request,
   res: Response,
-  next: NextFunction,
+  __: NextFunction,
 ) {
   if (err instanceof BadRequestError) {
-    respondWithError(res, 400, err.message);
+    return respondWithError(res, 400, err.message);
   } else if (err instanceof UnauthorizedError) {
-    respondWithError(res, 401, err.message);
+    return respondWithError(res, 401, err.message);
   } else if (err instanceof ForbiddenError) {
-    respondWithError(res, 403, err.message);
+    return respondWithError(res, 403, err.message);
   } else if (err instanceof NotFoundError) {
-    respondWithError(res, 404, err.message);
+    return respondWithError(res, 404, err.message);
   } else {
-    respondWithError(res, 500, err.message);
+    return respondWithError(res, 500, err.message);
   }
-
-  next();
 }
