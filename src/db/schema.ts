@@ -12,7 +12,7 @@ export const users = pgTable("users", {
 });
 
 export const chirps = pgTable("chirps", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()

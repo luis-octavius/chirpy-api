@@ -8,11 +8,7 @@ import {
 import { UserRequest, CreateUserResponse } from "../types/users.js";
 import { respondWithJSON } from "./json.js";
 import { config } from "../config.js";
-import {
-  BadRequestError,
-  ForbiddenError,
-  UnauthorizedError,
-} from "./errors.js";
+import { BadRequestError, UnauthorizedError } from "./errors.js";
 import {
   checkPasswordHash,
   getBearerToken,
@@ -62,7 +58,6 @@ export async function handlerReset(_: Request, res: Response) {
     await deleteUsers();
 
     const msg = "Users deleted successfully";
-    console.log(msg);
     respondWithJSON(res, 200, msg);
     return;
   } catch (err) {
@@ -91,12 +86,8 @@ export async function handlerLogin(req: Request, res: Response) {
     const token = makeJWT(user.id, 3600, config.secret);
     const refreshToken = makeRefreshToken();
 
-    try {
-      const createdRefreshToken = createRefreshToken(user.id, refreshToken);
-      console.log(createdRefreshToken);
-    } catch (err) {
-      throw new Error("Internal server error");
-    }
+    const createdRefreshToken = await createRefreshToken(user.id, refreshToken);
+    console.log(createdRefreshToken);
 
     const { hashedPassword, ...safeUser } = user;
 

@@ -10,6 +10,7 @@ import {
   handlerAddChirp,
   handlerAllChirps,
   handlerGetChirpById,
+  handlerDeleteChirpById,
 } from "./api/chirps.js";
 import {
   handlerCreateUser,
@@ -54,6 +55,10 @@ app.get("/api/chirps", (req, res, next) => {
 
 app.get("/api/chirps/:chirpId", (req, res, next) => {
   Promise.resolve(handlerGetChirpById(req, res)).catch(next);
+});
+
+app.delete("/api/chirps/:chirpId", (req, res, next) => {
+  Promise.resolve(handlerDeleteChirpById(req, res)).catch(next);
 });
 
 // user endpoints
