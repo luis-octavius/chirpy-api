@@ -13,8 +13,10 @@ import {
   deleteChirpById,
   getChirpById,
   getChirps,
+  getChirpsByUserId,
 } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "../auth/auth.js";
+import { Chirp } from "../db/schema.js";
 
 export async function handlerAddChirp(req: Request, res: Response) {
   const MAX_CHIRP_LENGTH = 140;
@@ -42,11 +44,18 @@ export async function handlerAddChirp(req: Request, res: Response) {
 }
 
 export async function handlerAllChirps(req: Request, res: Response) {
-  try {
-    let allChirps = await getChirps();
-  } catch (err) {
-    throw new Error("Error getting all the chirps");
+  const authorId = req.query.authorId as string;
+  console.log("authorId: ", authorId);
+
+  let allChirps: Chirp[];
+
+  if (!authorId) {
+    allChirps = await getChirps();
+  } else {
+    allChirps = await getChirpsByUserId(authorId);
   }
+
+  respondWithJSON(res, 200, allChirps);
 }
 
 export async function handlerGetChirpById(req: Request, res: Response) {
