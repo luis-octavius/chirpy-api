@@ -36,6 +36,13 @@
       "when": 1780780047102,
       "tag": "0004_marvelous_ikaris",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780860522354,
+      "tag": "0005_bouncy_chat",
+      "breakpoints": true
     }
   ]
 }
