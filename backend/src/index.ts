@@ -28,7 +28,10 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 
 // do the migration automatically at the app initialization
-const migrationClient = postgres(config.db.url, { max: 1 });
+const migrationClient = postgres(config.db.url, {
+  max: 1,
+  onnotice: () => {},
+});
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
 
 const app = express();
@@ -98,4 +101,5 @@ app.post("/admin/reset", (req, res, next) => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
+  console.log(`Server running at ${PORT}...`);
 });
