@@ -150,6 +150,10 @@ export async function handlerUpdateUser(req: Request, res: Response) {
     throw new BadRequestError("Invalid request");
   }
 
-  const updatedUser = await updateEmailAndPassword(hashedPassword, email);
+  const updatedUser = await updateEmailAndPassword(
+    userId,
+    hashedPassword,
+    email,
+  );
   respondWithJSON(res, 200, updatedUser);
 }

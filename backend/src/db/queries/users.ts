@@ -22,16 +22,21 @@ export async function getUserByEmail(email: string) {
   return user;
 }
 
-export async function updateEmailAndPassword(password: string, email: string) {
+export async function updateEmailAndPassword(
+  userId: string,
+  password: string,
+  email: string,
+) {
   const [updatedUser] = await db
     .update(users)
     .set({
       hashedPassword: password,
       email: email,
     })
+    .where(eq(users.id, userId))
     .returning();
-  const omitPassword = updatedUser as CreateUserResponse;
-  return omitPassword;
+  const { hashedPassword, ...safeUser } = updatedUser;
+  return safeUser;
 }
 
 export async function updateChirpyRedStatusById(userId: string) {
