@@ -18,6 +18,8 @@ import {
 import { getBearerToken, validateJWT } from "../auth/auth.js";
 import { Chirp } from "../db/schema.js";
 
+type sort = "asc" | "desc";
+
 export async function handlerAddChirp(req: Request, res: Response) {
   const MAX_CHIRP_LENGTH = 140;
 
@@ -45,15 +47,22 @@ export async function handlerAddChirp(req: Request, res: Response) {
 
 export async function handlerAllChirps(req: Request, res: Response) {
   const authorId = req.query.authorId as string;
-  console.log("authorId: ", authorId);
-
+  let sort = req.query.sort as sort;
   let allChirps: Chirp[];
+
+  if (!sort) {
+    sort = "asc";
+  }
 
   if (!authorId) {
     allChirps = await getChirps();
   } else {
     allChirps = await getChirpsByUserId(authorId);
   }
+
+  allChirps.sort((chirpOne, chirpTwo) =>
+    compareChirpsByCreatedAt(chirpOne.createdAt!, chirpTwo.createdAt!, sort),
+  );
 
   respondWithJSON(res, 200, allChirps);
 }
@@ -101,4 +110,13 @@ function filterWords(body: string) {
   }
 
   return words.join(" ").trim();
+}
+
+function compareChirpsByCreatedAt(
+  chirpOne: Date,
+  chirpTwo: Date,
+  sortBy: sort,
+): number {
+  const order = sortBy === "asc" ? 1 : -1;
+  return (chirpOne.getTime() - chirpTwo.getTime()) * order;
 }
